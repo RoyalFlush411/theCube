@@ -1,1 +1,1 @@
-theCube
+The Cube (GitHub)

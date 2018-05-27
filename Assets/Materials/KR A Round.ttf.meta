@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: aa6ab6fa9baca40b6992e368a4363f2a
+timeCreated: 1523355784
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: KR A Round
+  fontNames:
+  - KR A Round
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
