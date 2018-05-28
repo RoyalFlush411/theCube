@@ -964,7 +964,7 @@ public class theCubeScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private string TwitchHelpMessage = "Press the buttons in reading order with !{0} press 1 2 3. Press the execute button with !{0} execute.";
+    private string TwitchHelpMessage = @"Press the buttons in reading order with !{0} press 1 2 3. Press the execute button with !{0} execute.";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
