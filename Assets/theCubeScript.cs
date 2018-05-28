@@ -96,6 +96,10 @@ public class theCubeScript : MonoBehaviour
     static int moduleIdCounter = 1;
     int moduleId;
 
+    //TP
+    bool solveCoroStarted = false;
+    bool pressingButtons = false;
+
     void Awake()
     {
         moduleId = moduleIdCounter++;
@@ -917,6 +921,7 @@ public class theCubeScript : MonoBehaviour
                 break;
 
                 case 8:
+                solveCoroStarted = true;
                 Debug.LogFormat("[The Cube #{0}] You pressed the correct buttons. Stage 8 passed. Mothership contacted. Module disarmed.", moduleId);
                 Audio.PlaySoundAtTransform("contact", transform);
                 StartCoroutine(buttonAnimationUndo());
@@ -955,6 +960,49 @@ public class theCubeScript : MonoBehaviour
         if (moduleSolved == false)
         {
             executeLock = false;
+        }
+    }
+
+#pragma warning disable 414
+    private string TwitchHelpMessage = "Press the buttons in reading order with !{0} press 1 2 3. Press the execute button with !{0} execute.";
+#pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        var parts = command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length == 1 && parts[0] == "execute")
+        {
+            while (pressingButtons)
+            {
+                yield return new WaitForSeconds(1f);
+            }
+            yield return null;
+            executeButtonPress();
+            yield break;
+        }
+
+        if (parts.Length > 1 && parts[0] == "press" && parts.Skip(1).All(part => part.Length == 1 && "12345678".Contains(part)))
+        {
+            yield return null;
+
+            pressingButtons = true;
+            var cmdNumbers = parts.Skip(1).ToArray();
+
+            for ( int i = 0; i < cmdNumbers.Length; i++)
+            {
+                int num;
+                int.TryParse(cmdNumbers[i], out num);
+
+                numberButtonPress(numberButtons[num - 1]);
+                yield return new WaitForSeconds(.3f);
+            }
+            pressingButtons = false;
+        }
+
+        if (solveCoroStarted)
+        {
+            yield return "solve";
         }
     }
 }
