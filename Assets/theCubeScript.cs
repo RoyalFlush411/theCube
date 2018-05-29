@@ -23,7 +23,6 @@ public class theCubeScript : MonoBehaviour
 
     //Cube movement
     int rotation = 0;
-    int selections = 0;
     int axisSelection = 0;
     int selectionIncreaser = 0;
     private List<int> selectedRotations = new List<int>();
@@ -110,12 +109,21 @@ public class theCubeScript : MonoBehaviour
 
     void Start()
     {
-        while (selections != 6)
+        while (selectedRotations.Count != 6)
         {
             int selection = UnityEngine.Random.Range(0, 6);
+
+            // Prevent the rare case of having only clockwise and counter-clockwise rotations (0 and 3) because that would make the bottom face near-impossible to see.
+            if (selectedRotations.Count == 5 && selectedRotations.All(s => s == 0 || s == 3))
+            {
+                selection = UnityEngine.Random.Range(1, 5);
+                if (selection >= 3)
+                    selection++;
+            }
+
             selectedRotations.Add(selection);
-            selections++;
         }
+
         Debug.LogFormat("[The Cube #{0}] Cube movements: #1 is {1}. #2 is {2}. #3 is {3}. #4 is {4}. #5 is {5}. #6 is {6}.", moduleId, rotationName[selectedRotations[0]], rotationName[selectedRotations[1]], rotationName[selectedRotations[2]], rotationName[selectedRotations[3]], rotationName[selectedRotations[4]], rotationName[selectedRotations[5]]);
         foreach (TextMesh digit in cubeScreens)
         {
