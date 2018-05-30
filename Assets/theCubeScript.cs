@@ -976,7 +976,7 @@ public class theCubeScript : MonoBehaviour
     {
         var parts = command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-        if (parts.Length == 1 && parts[0] == "turn")
+        if (parts.Length == 1 && parts[0] == "turn" && !turnCommand)
         {
             yield return null;
             turnCommand = true;
