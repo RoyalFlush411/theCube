@@ -99,6 +99,7 @@ public class theCubeScript : MonoBehaviour
     //TP
     bool solveCoroStarted = false;
     bool pressingButtons = false;
+    bool turnCommand = false;
 
     void Awake()
     {
@@ -485,6 +486,10 @@ public class theCubeScript : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
             }
             rotation = 0;
+            while (turnCommand)
+            {
+                yield return new WaitForSeconds(2f);
+            }
             selectionIncreaser++;
             if (selectionIncreaser == 6 && ciphersLogged == false)
             {
@@ -964,12 +969,36 @@ public class theCubeScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private string TwitchHelpMessage = @"Press the buttons in reading order with !{0} press 1 2 3. Press the execute button with !{0} execute.";
+    private string TwitchHelpMessage = @"Press the buttons in reading order with !{0} press 1 2 3. Press the execute button with !{0} execute. Look at the faces of the cube with !{0} turn.";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         var parts = command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length == 1 && parts[0] == "turn")
+        {
+            yield return null;
+            turnCommand = true;
+            yield return new WaitForSeconds(4f);
+            while (rotation != 360)
+            {
+                yield return new WaitForSeconds(0.02f);
+                cipherBox.transform.localRotation = Quaternion.Euler(1.0f, 0.0f, 0.0f) * cipherBox.transform.localRotation; ;
+                rotation++;
+            }
+            rotation = 0;
+            while (rotation != 360)
+            {
+                yield return new WaitForSeconds(0.02f);
+                cipherBox.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, 1.0f) * cipherBox.transform.localRotation; ;
+                rotation++;
+            }
+            rotation = 0;
+            yield return new WaitForSeconds(4f);
+            turnCommand = false;
+            yield break;
+        }
 
         if (parts.Length == 1 && parts[0] == "execute")
         {
