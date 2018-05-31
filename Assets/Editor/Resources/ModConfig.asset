@@ -13,11 +13,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: cube
   title: The Cube
-  description: "The Cube 1.1\nThe mothership has been contacted. They\u2019ve sent
-    an executive toy\u2026\n\nModule ID: cube\n\nCreated by: Royal_Flu$h\n\nSpecial
-    thanks to AshTheBash for his help with rotation.\nThanks to Timwi for UV mapping
-    the component background.\nExtra special thanks to Timwi for the amazing manual
-    image.\n\nManual available here: https://ktane.timwi.de/HTML/The%20Cube.html"
-  version: 1.1
+  description: "The Cube 1.2\nThe mothership has been contacted. They\u2019ve sent
+    an executive toy\u2026\n\nModule ID: cube\n\nCreated by: Royal_Flu$h\nTwitchPlays
+    implemented by: KingBranBran\n\nSpecial thanks to AshTheBash for his help with
+    rotation.\nThanks to Timwi for UV mapping the component background.\nExtra special
+    thanks to Timwi for the amazing manual image.\n\nManual available here: https://ktane.timwi.de/HTML/The%20Cube.html"
+  version: 1.2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: a6bb273642f8841deaf708d7ff43e3de, type: 3}
