@@ -98,6 +98,7 @@ public class theCubeScript : MonoBehaviour
 
     //TP
     bool turnCommand = false;
+	bool strikePending = false;
 
     void Awake()
     {
@@ -955,6 +956,7 @@ public class theCubeScript : MonoBehaviour
                 correctButtons[index] = false;
             }
             answerCalculator();
+	        strikePending = false;
         }
         if (moduleSolved == false)
         {
@@ -970,7 +972,13 @@ public class theCubeScript : MonoBehaviour
     {
         var parts = command.ToLowerInvariant().Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
 
-        if (parts.Length == 1 && parts[0] == "turn" && !turnCommand)
+	    if (strikePending)
+	    {
+		    yield return "sendtochaterror A strike is incoming. Please wait for the strike before continueing.";
+		    yield break;
+	    }
+
+        if (parts.Length == 1 && parts[0] == "turn")
         {
             yield return null;
 
@@ -1021,6 +1029,7 @@ public class theCubeScript : MonoBehaviour
 		        }
 		        else
 		        {
+			        strikePending = true;
 			        yield return "strike";
 		        }
 			}
