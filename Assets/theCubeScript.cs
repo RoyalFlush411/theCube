@@ -486,11 +486,8 @@ public class theCubeScript : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
             }
             rotation = 0;
-            while (turnCommand)
-            {
-                yield return new WaitForSeconds(2f);
-            }
-            selectionIncreaser++;
+	        selectionIncreaser++;
+	        yield return new WaitUntil(() => !turnCommand);
             if (selectionIncreaser == 6 && ciphersLogged == false)
             {
                 rotationComplete = true;
@@ -979,8 +976,11 @@ public class theCubeScript : MonoBehaviour
         if (parts.Length == 1 && parts[0] == "turn" && !turnCommand)
         {
             yield return null;
-            turnCommand = true;
-            yield return new WaitForSeconds(4f);
+
+	        var currentSelection = selectionIncreaser;
+			turnCommand = true;
+	        yield return new WaitUntil(() => currentSelection != selectionIncreaser);
+            yield return new WaitForSeconds(1f);
             while (rotation != 360)
             {
                 yield return new WaitForSeconds(0.02f);
@@ -995,7 +995,7 @@ public class theCubeScript : MonoBehaviour
                 rotation++;
             }
             rotation = 0;
-            yield return new WaitForSeconds(4f);
+            yield return new WaitForSeconds(1f);
             turnCommand = false;
             yield break;
         }
