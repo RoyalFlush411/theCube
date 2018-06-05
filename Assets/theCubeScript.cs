@@ -1016,17 +1016,27 @@ public class theCubeScript : MonoBehaviour
         {
             yield return null;
 
-            foreach (var num in parts.Skip(1).Select(num => int.Parse(num) - 1))
+	        while (executeLock || generalButtonLock)
+	        {
+		        yield return "trycancel";
+	        }
+
+	        foreach (var num in parts.Skip(1).Select(num => int.Parse(num) - 1))
             {
-	            yield return new WaitUntil(() => !executeLock && !generalButtonLock);
 	            numberButtonPress(numberButtons[num]);
-	            yield return new WaitForSeconds(.1f);
+	            yield return new WaitUntil(() => !executeLock && !generalButtonLock);
+				yield return new WaitForSeconds(.1f);
             }
 
-	        if (parts[0] == "execute" || parts[0] == "submit") 
+	        if (parts[0] == "execute" || parts[0] == "submit")
 	        {
-		        yield return new WaitUntil(() => !executeLock && !generalButtonLock && rotationComplete);
-		        executeButtonPress();
+
+		        while (executeLock || generalButtonLock || !rotationComplete)
+		        {
+			        yield return "trycancel";
+		        }
+
+				executeButtonPress();
 		        yield return new WaitForSeconds(.1f);
 
 		        if (buttonPushed[0] == correctButtons[0] && buttonPushed[1] == correctButtons[1] && buttonPushed[2] == correctButtons[2] && buttonPushed[3] == correctButtons[3] && buttonPushed[4] == correctButtons[4] && buttonPushed[5] == correctButtons[5] && buttonPushed[6] == correctButtons[6] && buttonPushed[7] == correctButtons[7])
