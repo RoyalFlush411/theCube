@@ -97,8 +97,6 @@ public class theCubeScript : MonoBehaviour
     int moduleId;
 
     //TP
-    bool solveCoroStarted = false;
-    bool pressingButtons = false;
     bool turnCommand = false;
 
     void Awake()
@@ -923,7 +921,6 @@ public class theCubeScript : MonoBehaviour
                 break;
 
                 case 8:
-                solveCoroStarted = true;
                 Debug.LogFormat("[The Cube #{0}] You pressed the correct buttons. Stage 8 passed. Mothership contacted. Module disarmed.", moduleId);
                 Audio.PlaySoundAtTransform("contact", transform);
                 StartCoroutine(buttonAnimationUndo());
@@ -1000,38 +997,33 @@ public class theCubeScript : MonoBehaviour
             yield break;
         }
 
-        if (parts.Length == 1 && parts[0] == "execute")
-        {
-            while (pressingButtons)
-            {
-                yield return new WaitForSeconds(1f);
-            }
-            yield return null;
-            executeButtonPress();
-            yield break;
-        }
-
-        if (parts.Length > 1 && parts[0] == "press" && parts.Skip(1).All(part => part.Length == 1 && "12345678".Contains(part)))
+        if (((parts[0] == "press" && parts.Length > 1) || parts[0] == "execute" || parts[0] == "submit") && parts.Skip(1).All(part => part.Length == 1 && "12345678".Contains(part)))
         {
             yield return null;
 
-            pressingButtons = true;
-            var cmdNumbers = parts.Skip(1).ToArray();
-
-            for ( int i = 0; i < cmdNumbers.Length; i++)
+            foreach (var num in parts.Skip(1).Select(num => int.Parse(num) - 1))
             {
-                int num;
-                int.TryParse(cmdNumbers[i], out num);
-
-                numberButtonPress(numberButtons[num - 1]);
-                yield return new WaitForSeconds(.3f);
+	            yield return new WaitUntil(() => !executeLock && !generalButtonLock);
+	            numberButtonPress(numberButtons[num]);
+	            yield return new WaitForSeconds(.1f);
             }
-            pressingButtons = false;
-        }
 
-        if (solveCoroStarted)
-        {
-            yield return "solve";
+	        if (parts[0] == "execute" || parts[0] == "submit") 
+	        {
+		        yield return new WaitUntil(() => !executeLock && !generalButtonLock && rotationComplete);
+		        executeButtonPress();
+		        yield return new WaitForSeconds(.1f);
+
+		        if (buttonPushed[0] == correctButtons[0] && buttonPushed[1] == correctButtons[1] && buttonPushed[2] == correctButtons[2] && buttonPushed[3] == correctButtons[3] && buttonPushed[4] == correctButtons[4] && buttonPushed[5] == correctButtons[5] && buttonPushed[6] == correctButtons[6] && buttonPushed[7] == correctButtons[7])
+		        {
+					if(stage == 8)
+						yield return "solve";
+		        }
+		        else
+		        {
+			        yield return "strike";
+		        }
+			}
         }
     }
 }
