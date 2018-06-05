@@ -971,7 +971,7 @@ public class theCubeScript : MonoBehaviour
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        var parts = command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = command.ToLowerInvariant().Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length == 1 && parts[0] == "turn" && !turnCommand)
         {
