@@ -99,6 +99,7 @@ public class theCubeScript : MonoBehaviour
     //TP
     bool turnCommand = false;
 	bool strikePending = false;
+	bool solvePending = false;
 
     void Awake()
     {
@@ -978,6 +979,12 @@ public class theCubeScript : MonoBehaviour
 		    yield break;
 	    }
 
+	    if (solvePending)
+	    {
+		    yield return "sendtochat module solve is processing.";
+		    yield break;
+	    }
+
         if (parts.Length == 1 && parts[0] == "turn")
         {
             yield return null;
@@ -1024,8 +1031,11 @@ public class theCubeScript : MonoBehaviour
 
 		        if (buttonPushed[0] == correctButtons[0] && buttonPushed[1] == correctButtons[1] && buttonPushed[2] == correctButtons[2] && buttonPushed[3] == correctButtons[3] && buttonPushed[4] == correctButtons[4] && buttonPushed[5] == correctButtons[5] && buttonPushed[6] == correctButtons[6] && buttonPushed[7] == correctButtons[7])
 		        {
-					if(stage == 8)
-						yield return "solve";
+			        if (stage == 8)
+			        {
+				        solvePending = true;
+				        yield return "solve";
+			        }
 		        }
 		        else
 		        {
