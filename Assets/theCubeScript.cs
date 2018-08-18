@@ -983,13 +983,13 @@ public class theCubeScript : MonoBehaviour
 
 	    if (strikePending)
 	    {
-		    yield return "sendtochaterror A strike is incoming. Please wait for the strike before continueing.";
+		    yield return "sendtochaterror A strike is incoming. Please wait for the strike before continuing.";
 		    yield break;
 	    }
 
 	    if (solvePending)
 	    {
-		    yield return "sendtochat module solve is processing.";
+		    yield return "sendtochat Module solve is processing.";
 		    yield break;
 	    }
 
