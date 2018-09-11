@@ -952,14 +952,14 @@ public class theCubeScript : MonoBehaviour
         }
         else
         {
-            Debug.LogFormat("[The Cube #{0}] Strike! At stage {1}, your buttons were: #1 is {2}. #2 is {3}. #3 is {4}. #4 is {5}. #5 is {6}. #6 is {7}. #7 is {8}. #8 is {9}. That is incorrect. The module has been reset to stage 1.", moduleId, stage, buttonPushed[0], buttonPushed[1], buttonPushed[2], buttonPushed[3], buttonPushed[4], buttonPushed[5], buttonPushed[6], buttonPushed[7]);
+            Debug.LogFormat("[The Cube #{0}] Strike! At stage {1}, your buttons were: #1 is {2}. #2 is {3}. #3 is {4}. #4 is {5}. #5 is {6}. #6 is {7}. #7 is {8}. #8 is {9}. That is incorrect.", moduleId, stage, buttonPushed[0], buttonPushed[1], buttonPushed[2], buttonPushed[3], buttonPushed[4], buttonPushed[5], buttonPushed[6], buttonPushed[7]);
             GetComponent<KMBombModule>().HandleStrike();
             StartCoroutine(buttonAnimationUndo());
-            foreach (Renderer light in lights)
+            /*/foreach (Renderer light in lights)
             {
                 light.material.mainTexture = lightColours[0];
             }
-            stage = 1;
+            stage = 1;/*/
             for (int index = 0; index < correctButtons.Length; ++index)
             {
                 correctButtons[index] = false;
