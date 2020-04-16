@@ -1,9 +1,7 @@
 fileFormatVersion: 2
 guid: 2d47ad1f8c2e24cc890c921397abd3fe
-timeCreated: 1518084806
-licenseType: Free
 ModelImporter:
-  serializedVersion: 21
+  serializedVersion: 22
   fileIDToRecycleName:
     100000: //RootNode
     100002: KeyboardKey
@@ -115,6 +113,7 @@ ModelImporter:
     400104: SquareButtonPlunger_Square0_06_3to1
     400106: SquareButtonPlunger_Square0_06_3to2
     400108: SquareButtonPlunger_Square0_06_4to1
+    2100000: Material
     2300000: KeyboardKey
     2300002: KeyboardKey_0_1
     2300004: KeyboardKey_0_1_2to1
@@ -279,10 +278,12 @@ ModelImporter:
     4300106: SquareButton
     7400000: Default Take
     9500000: //RootNode
+  externalObjects: {}
   materials:
     importMaterials: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -295,6 +296,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
@@ -319,6 +321,8 @@ ModelImporter:
     optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
@@ -352,5 +356,5 @@ ModelImporter:
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
-  assetBundleName: 
+  assetBundleName: mod.bundle
   assetBundleVariant: 
