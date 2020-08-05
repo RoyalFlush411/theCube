@@ -992,7 +992,7 @@ public class theCubeScript : MonoBehaviour
 		    yield return "sendtochat Module solve is processing.";
 		    yield break;
 	    }
-
+        if (parts.Length == 0) yield break;
         if (parts.Length == 1 && parts[0] == "turn")
         {
             yield return null;

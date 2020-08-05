@@ -1,15 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 using System.Linq;
-using System;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
 /// <summary>
-///
+/// 
 /// The AssetBundler does several useful things when preparing your mod:
-///
+/// 
 /// 1. Modifies all non-Editor MonoScript files to reference ASSEMBLY_NAME rather than Assembly-CSharp.
 ///     - At runtime in the game, this new assembly will be used to resolve the script references.
 /// 2. Builds your project as ASSEMBLY_NAME.dll rather than Assembly-CSharp.dll.
@@ -17,7 +17,7 @@ using System.Reflection;
 /// 3. Copies any managed assemblies from Assets/Plugins to the output folder for inclusion alongside your bundle.
 /// 4. Builds the AssetBundle and copies the relevant .bundle file to the final output folder.
 /// 5. Restores MonoScript references to Assembly-CSharp so they can be found by the Unity Editor again.
-///
+/// 
 /// </summary>
 public class AssetBundler
 {
@@ -62,6 +62,11 @@ public class AssetBundler
     /// List of MonoScripts modified during the bundling process that need to be restored after.
     /// </summary>
     private List<string> scriptPathsToRestore = new List<string>();
+    
+    /// <summary>
+    /// A variable for holding the current BuildTarget, for Mac compatibility.
+    /// </summary>
+    BuildTarget target = BuildTarget.StandaloneWindows;
     #endregion
 
     [MenuItem("Keep Talking ModKit/Build AssetBundle _F6", priority = 10)]
@@ -80,7 +85,7 @@ public class AssetBundler
     {
         Debug.LogFormat("Creating \"{0}\" AssetBundle...", BUNDLE_FILENAME);
 
-        if (ModConfig.Instance == null
+        if (ModConfig.Instance == null 
             || ModConfig.ID == ""
             || ModConfig.OutputFolder == "")
         {
@@ -92,6 +97,7 @@ public class AssetBundler
 
         bundler.assemblyName = ModConfig.ID;
         bundler.outputFolder = ModConfig.OutputFolder + "/" + bundler.assemblyName;
+        if (Application.platform == RuntimePlatform.OSXEditor) bundler.target = BuildTarget.StandaloneOSX;
 
         bool success = false;
 
@@ -239,15 +245,15 @@ public class AssetBundler
             .ToList();
 
         string unityAssembliesLocation;
-        switch (System.Environment.OSVersion.Platform)
+        switch (Application.platform)
         {
-            case PlatformID.MacOSX:
-            case PlatformID.Unix:
-                unityAssembliesLocation = EditorApplication.applicationPath.Replace("Unity.app", "Unity.app/Contents/Managed/");
+            case RuntimePlatform.OSXEditor:
+                unityAssembliesLocation = EditorApplication.applicationPath + "/Contents/Managed/";
                 break;
-            case PlatformID.Win32NT:
+            case RuntimePlatform.LinuxEditor:
+            case RuntimePlatform.WindowsEditor:
             default:
-                unityAssembliesLocation = EditorApplication.applicationPath.Replace("Unity.exe", "Data/Managed/");
+                unityAssembliesLocation = Path.Combine(Path.GetDirectoryName(EditorApplication.applicationPath), @"Data/Managed/");
                 break;
         }
 
@@ -265,7 +271,7 @@ public class AssetBundler
         int apiCompatibilityLevel = 1; //NET_2_0 compatibility level is enum value 1
         Assembly assembly = Assembly.GetAssembly(typeof(MonoScript));
         var monoIslandType = assembly.GetType("UnityEditor.Scripting.MonoIsland");
-        object monoIsland = Activator.CreateInstance(monoIslandType, BuildTarget.StandaloneOSXUniversal, apiCompatibilityLevel, scriptArray, referenceArray, defineArray, outputFilename);
+        object monoIsland = Activator.CreateInstance(monoIslandType, target, apiCompatibilityLevel, scriptArray, referenceArray, defineArray, outputFilename);
 
         //MonoCompiler itself
         var monoCompilerType = assembly.GetType("UnityEditor.Scripting.Compilers.MonoCSharpCompiler");
@@ -277,7 +283,7 @@ public class AssetBundler
 
         //CompilerMessage
         var compilerMessageType = assembly.GetType("UnityEditor.Scripting.Compilers.CompilerMessage");
-        FieldInfo messageField = compilerMessageType.GetField("message");
+        FieldInfo messageField = compilerMessageType.GetField("message"); 
 
         //Start compiling
         beginCompilingMethod.Invoke(monoCompiler, null);
@@ -351,12 +357,12 @@ public class AssetBundler
 
     /// <summary>
     /// Make use of internal Unity functionality to change which assembly a MonoScript points to.
-    ///
+    /// 
     /// We change this to allow Unity to reconnect references to the script when loaded into KTaNE. Normally, a MonoScript
     /// points to the Assembly-CSharp.dll assembly. Because we are forced to build the mod assembly with a different name,
     /// Unity would not normally be able to reconnect the script. Here we can change the assembly name a MonoScript points to
     /// and resolve the problem.
-    ///
+    /// 
     /// WARNING! The Unity Editor expects MonoScripts to resolve to the Assembly-CSharp assembly, so you MUST change it back
     /// or else the editor will lose the script reference (and you'll be forced to delete your Library to recover).
     /// </summary>
@@ -421,9 +427,9 @@ public class AssetBundler
         //not be accessible within the asset bundle. Unity has deprecated this flag claiming it is now always active, but due to a bug
         //we must still include it (and ignore the warning).
         BuildPipeline.BuildAssetBundles(
-           TEMP_BUILD_FOLDER,
-           BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.CollectDependencies,
-           BuildTarget.StandaloneOSXUniversal);
+            TEMP_BUILD_FOLDER, 
+            BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.CollectDependencies, 
+            target);
 #pragma warning restore 618
 
         //We are only interested in the BUNDLE_FILENAME bundle (and not the extra AssetBundle or the manifest files
@@ -442,8 +448,22 @@ public class AssetBundler
 
         if(ModConfig.PreviewImage != null)
         {
-            byte[] bytes = ModConfig.PreviewImage.EncodeToPNG();
-            File.WriteAllBytes(outputFolder + "/previewImage.png", bytes);
+            string previewImageAssetPath = AssetDatabase.GetAssetPath(ModConfig.PreviewImage);
+
+            if (!string.IsNullOrEmpty(previewImageAssetPath))
+            {
+                TextureImporter importer = AssetImporter.GetAtPath(previewImageAssetPath) as TextureImporter;
+
+                if (!importer.isReadable || importer.textureCompression != TextureImporterCompression.Uncompressed)
+                {
+                    importer.isReadable = true;
+                    importer.textureCompression = TextureImporterCompression.Uncompressed;
+                    importer.SaveAndReimport();
+                }
+
+                byte[] bytes = ModConfig.PreviewImage.EncodeToPNG();
+                File.WriteAllBytes(outputFolder + "/previewImage.png", bytes);
+            }
         }
     }
 
@@ -499,7 +519,7 @@ public class AssetBundler
             {
                 file.CopyTo(temppath, false);
             }
-
+            
         }
 
         // If copying subdirectories, copy them and their contents to new location.
@@ -515,7 +535,7 @@ public class AssetBundler
 
 
     /// <summary>
-    /// All assets tagged with "mod.bundle" will be included in the build, including the Example assets. Print out a
+    /// All assets tagged with "mod.bundle" will be included in the build, including the Example assets. Print out a 
     /// warning to notify mod authors that they may wish to delete the examples.
     /// </summary>
     protected void WarnIfExampleAssetsAreIncluded()
@@ -619,11 +639,18 @@ public class AssetBundler
                     materialInfo.ShaderNames = new List<string>();
                     foreach(Material material in renderer.sharedMaterials)
                     {
-                        if (material == null || material.shader == null)
+                        if (material == null)
                         {
+                            var obj = renderer.transform;
+                            var str = new List<string>();
+                            while (obj != null)
+                            {
+                                str.Add(obj.gameObject.name);
+                                obj = obj.parent;
+                            }
+                            Debug.LogWarningFormat("There is an unassigned material on the following object: {0}", string.Join(" > ", str.ToArray()));
                             continue;
                         }
-                        
                         materialInfo.ShaderNames.Add(material.shader.name);
 
                         if(material.shader.name == "Standard")
